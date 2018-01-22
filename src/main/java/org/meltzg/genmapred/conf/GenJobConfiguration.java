@@ -24,6 +24,8 @@ public class GenJobConfiguration {
 	private String customConfClass;
 	private String outputKeyClass;
 	private String outputValueClass;
+	private String inputPath;
+	private String outputPath;
 	
 	private Object customConf;
 	
@@ -79,6 +81,24 @@ public class GenJobConfiguration {
 
 	public void setOutputValueClass(String outputValueClass) {
 		this.outputValueClass = outputValueClass;
+	}
+
+	@XmlElement
+	public String getInputPath() {
+		return inputPath;
+	}
+
+	public void setInputPath(String inputPath) {
+		this.inputPath = inputPath;
+	}
+
+	@XmlElement
+	public String getOutputPath() {
+		return outputPath;
+	}
+
+	public void setOutputPath(String outputPath) {
+		this.outputPath = outputPath;
 	}
 
 	@XmlAnyElement

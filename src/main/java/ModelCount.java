@@ -5,6 +5,8 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.meltzg.genmapred.examples.ModelCountMapper;
+import org.meltzg.genmapred.examples.ModelCountReducer;
 
 /* hdfs-site.xml
  * <property>
