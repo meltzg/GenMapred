@@ -11,7 +11,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.meltzg.genmapred.conf.GenJobConfiguration;
 
-@XmlRootElement(name="dummy-conf")
+@XmlRootElement
 public class DummyCustomConf {
 	private String foo;
 	private int bar;
@@ -44,12 +44,14 @@ public class DummyCustomConf {
 		dummy.setBar(1234);
 		
 		conf.setJobName("test");
-		conf.setMapClass("ModelCountMapper");
-		conf.setReduceClass("ModelCountReducer");
+		conf.setMapClass("org.meltzg.genmapred.examples.ModelCountMapper");
+		conf.setReduceClass("org.meltzg.genmapred.examples.ModelCountReducer");
 		conf.setOutputKeyClass("org.apache.hadoop.io.Text");
 		conf.setOutputValueClass("org.apache.hadoop.io.IntWritable");
 		conf.setCustomConfClass(dummy.getClass().getCanonicalName());
 		conf.setCustomConf(dummy);
+		conf.setOutputPath("/activity-res3");
+		conf.setInputPath("/activity/*/*accelerometer*");
 		
 		GenJobConfiguration.marshal(conf, "conf.xml");
 		GenJobConfiguration conf2 = GenJobConfiguration.unmarshal("conf.xml");

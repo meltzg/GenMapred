@@ -16,19 +16,35 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.w3c.dom.Node;
 
-@XmlRootElement(name="gen-job")
+@XmlRootElement
 public class GenJobConfiguration {
+	
+	private String artifactJarS;
+	
 	private String jobName;
+	
 	private String mapClass;
+	private String combinerClass;
 	private String reduceClass;
-	private String customConfClass;
+	
 	private String outputKeyClass;
 	private String outputValueClass;
+	
 	private String inputPath;
 	private String outputPath;
 	
+	private String customConfClass;
 	private Object customConf;
 	
+	@XmlElement
+	public String getArtifactJarS() {
+		return artifactJarS;
+	}
+
+	public void setArtifactJarS(String artifactJarS) {
+		this.artifactJarS = artifactJarS;
+	}
+
 	@XmlElement
 	public String getJobName() {
 		return jobName;
@@ -48,21 +64,21 @@ public class GenJobConfiguration {
 	}
 
 	@XmlElement
+	public String getCombinerClass() {
+		return combinerClass;
+	}
+
+	public void setCombinerClass(String combinerClass) {
+		this.combinerClass = combinerClass;
+	}
+
+	@XmlElement
 	public String getReduceClass() {
 		return reduceClass;
 	}
 
 	public void setReduceClass(String reduceClass) {
 		this.reduceClass = reduceClass;
-	}
-
-	@XmlElement
-	public String getCustomConfClass() {
-		return customConfClass;
-	}
-
-	public void setCustomConfClass(String customConfClass) {
-		this.customConfClass = customConfClass;
 	}
 
 	@XmlElement
@@ -97,6 +113,15 @@ public class GenJobConfiguration {
 		return outputPath;
 	}
 
+	@XmlElement
+	public String getCustomConfClass() {
+		return customConfClass;
+	}
+
+	public void setCustomConfClass(String customConfClass) {
+		this.customConfClass = customConfClass;
+	}
+
 	public void setOutputPath(String outputPath) {
 		this.outputPath = outputPath;
 	}
@@ -109,14 +134,15 @@ public class GenJobConfiguration {
 	public void setCustomConf(Object customConf) {
 		this.customConf = customConf;
 	}
-
+	
 	@Override
 	public String toString() {
-		return "GenJobConfiguration [jobName=" + jobName + ", mapClass=" + mapClass + ", reduceClass=" + reduceClass
-				+ ", customConfClass=" + customConfClass + ", outputKeyClass=" + outputKeyClass + ", outputValueClass="
-				+ outputValueClass + ", customConf=" + customConf + "]";
+		return "GenJobConfiguration [jobName=" + jobName + ", mapClass=" + mapClass + ", combinerClass=" + combinerClass
+				+ ", reduceClass=" + reduceClass + ", outputKeyClass=" + outputKeyClass + ", outputValueClass="
+				+ outputValueClass + ", inputPath=" + inputPath + ", outputPath=" + outputPath + ", customConfClass="
+				+ customConfClass + ", customConf=" + customConf + "]";
 	}
-	
+
 	public static void marshal(GenJobConfiguration conf, String file) throws ClassNotFoundException, JAXBException, FileNotFoundException {
 		List<Class<?>> ctxtClasses = new ArrayList<Class<?>>();
 		ctxtClasses.add(GenJobConfiguration.class);
