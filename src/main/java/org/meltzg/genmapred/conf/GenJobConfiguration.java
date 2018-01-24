@@ -20,7 +20,7 @@ import org.w3c.dom.Node;
 @XmlRootElement
 public class GenJobConfiguration {
 	
-	private String artifactJarS;
+	private String artifactJar;
 	
 	private String jobName;
 	
@@ -38,12 +38,12 @@ public class GenJobConfiguration {
 	private Object customConf;
 	
 	@XmlElement
-	public String getArtifactJarS() {
-		return artifactJarS;
+	public String getArtifactJar() {
+		return artifactJar;
 	}
 
-	public void setArtifactJarS(String artifactJarS) {
-		this.artifactJarS = artifactJarS;
+	public void setArtifactJar(String artifactJar) {
+		this.artifactJar = artifactJar;
 	}
 
 	@XmlElement
