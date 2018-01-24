@@ -13,7 +13,10 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.transform.stream.StreamSource;
 
+import org.eclipse.persistence.jaxb.MarshallerProperties;
+import org.eclipse.persistence.jaxb.UnmarshallerProperties;
 import org.w3c.dom.Node;
 
 @XmlRootElement
@@ -155,17 +158,21 @@ public class GenJobConfiguration {
 		
 		JAXBContext context = JAXBContext.newInstance(ctxtClassArr);
 		Marshaller marshaller = context.createMarshaller();
+		marshaller.setProperty(MarshallerProperties.MEDIA_TYPE, "application/json");
+		marshaller.setProperty(MarshallerProperties.JSON_INCLUDE_ROOT, false);
 		
 		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-		marshaller.marshal(conf, new FileOutputStream("conf.xml"));
-		
+		marshaller.marshal(conf, new FileOutputStream(file));
 	}
 	
 	public static GenJobConfiguration unmarshal(String file) throws JAXBException, ClassNotFoundException {
 		JAXBContext context = JAXBContext.newInstance(GenJobConfiguration.class);
 		
 		Unmarshaller unmarshaller = context.createUnmarshaller();
-		GenJobConfiguration conf = (GenJobConfiguration) unmarshaller.unmarshal(new File(file));
+		unmarshaller.setProperty(UnmarshallerProperties.MEDIA_TYPE, "application/json");
+		unmarshaller.setProperty(UnmarshallerProperties.JSON_INCLUDE_ROOT, false);
+
+		GenJobConfiguration conf = unmarshaller.unmarshal(new StreamSource(new File(file)), GenJobConfiguration.class).getValue();
 		
 		if (conf.customConfClass != null && conf.customConf != null) {
 			context = JAXBContext.newInstance(Class.forName(conf.customConfClass));

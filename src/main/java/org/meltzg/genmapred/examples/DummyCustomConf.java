@@ -1,11 +1,8 @@
 package org.meltzg.genmapred.examples;
 
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -53,8 +50,8 @@ public class DummyCustomConf {
 		conf.setOutputPath("/activity-res3");
 		conf.setInputPath("/activity/*/*accelerometer*");
 		
-		GenJobConfiguration.marshal(conf, "conf.xml");
-		GenJobConfiguration conf2 = GenJobConfiguration.unmarshal("conf.xml");
+		GenJobConfiguration.marshal(conf, "conf.json");
+		GenJobConfiguration conf2 = GenJobConfiguration.unmarshal("conf.json");
 		
 		System.out.println(conf2);
 	}
