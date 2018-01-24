@@ -47,11 +47,11 @@ public class DummyCustomConf {
 		conf.setOutputValueClass("org.apache.hadoop.io.IntWritable");
 		conf.setCustomConfClass(dummy.getClass().getCanonicalName());
 		conf.setCustomConf(dummy);
-		conf.setOutputPath("/activity-res3");
+		conf.setOutputPath("/activity-res");
 		conf.setInputPath("/activity/*/*accelerometer*");
 		
-		GenJobConfiguration.marshal(conf, "conf.json");
-		GenJobConfiguration conf2 = GenJobConfiguration.unmarshal("conf.json");
+		GenJobConfiguration.marshal(conf, "conf.xml");
+		GenJobConfiguration conf2 = GenJobConfiguration.unmarshal("conf.xml");
 		
 		System.out.println(conf2);
 	}
