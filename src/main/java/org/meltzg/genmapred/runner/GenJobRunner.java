@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.xml.bind.JAXBException;
@@ -30,50 +31,39 @@ public class GenJobRunner extends Configured implements Tool {
 			System.exit(-1);
 		}
 
-		GenJobConfiguration masterConf = new GenJobConfiguration();
-		GenJobConfiguration secondConf = new GenJobConfiguration();
+		GenJobConfiguration primaryConf = new GenJobConfiguration();
+		GenJobConfiguration secondaryConf = new GenJobConfiguration();
 		
 		Path tmpLibPath = new Path("/tmp/artifacts/" + UUID.randomUUID().toString());
 
 		try {
-			masterConf = GenJobConfiguration.unmarshal(args[0]);
-			secondConf = args.length == 2 ? GenJobConfiguration.unmarshal(args[1]) : secondConf;
+			primaryConf = GenJobConfiguration.unmarshal(args[0]);
+			secondaryConf = args.length == 2 ? GenJobConfiguration.unmarshal(args[1]) : secondaryConf;
 		} catch (ClassNotFoundException | JAXBException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
+		primaryConf.merge(secondaryConf);
+		System.out.println("Marged configurations:");
+		System.out.println(GenJobConfiguration.toXMLString(primaryConf));
+		
 		Class<?> tmp;
 
-		// Set classes and configurations from the Master conf
-		tmp = getClass(masterConf.getMapClass(), masterConf.getArtifactJar());
+		// Set classes and configurations from the merged primary and secondary confs
+		tmp = getClass(primaryConf.getMapClass(), primaryConf.getArtifactJars());
 		Class<? extends Mapper> mapClass = tmp != null ? tmp.asSubclass(Mapper.class) : null;
-		tmp = getClass(masterConf.getCombinerClass(), masterConf.getArtifactJar());
+		tmp = getClass(primaryConf.getCombinerClass(), primaryConf.getArtifactJars());
 		Class<? extends Reducer> combinerClass = tmp != null ? tmp.asSubclass(Reducer.class) : null;
-		tmp = getClass(masterConf.getReduceClass(), masterConf.getArtifactJar());
+		tmp = getClass(primaryConf.getReduceClass(), primaryConf.getArtifactJars());
 		Class<? extends Reducer> reduceClass = tmp != null ? tmp.asSubclass(Reducer.class) : null;
 		
-		Class<?> outputKeyClass = getClass(masterConf.getOutputKeyClass(), masterConf.getArtifactJar());
-		Class<?> outputValClass = getClass(masterConf.getOutputValueClass(), masterConf.getArtifactJar());
+		Class<?> outputKeyClass = getClass(primaryConf.getOutputKeyClass(), primaryConf.getArtifactJars());
+		Class<?> outputValClass = getClass(primaryConf.getOutputValueClass(), primaryConf.getArtifactJars());
 
-		String jobName = masterConf.getJobName();
-		String inputPath = masterConf.getInputPath();
-		String outputPath = masterConf.getOutputPath();
-
-		// Set unset classes and configurations from the secondary conf
-		tmp = mapClass == null ? getClass(secondConf.getMapClass(), secondConf.getArtifactJar()) : null;
-		mapClass = tmp != null ? tmp.asSubclass(Mapper.class) : mapClass;
-		tmp = combinerClass == null ? getClass(secondConf.getCombinerClass(), secondConf.getArtifactJar()) : null;
-		combinerClass = tmp != null ? tmp.asSubclass(Reducer.class) : combinerClass;
-		tmp = reduceClass == null ? getClass(secondConf.getReduceClass(), secondConf.getArtifactJar()) : null;
-		reduceClass = tmp != null ? tmp.asSubclass(Reducer.class) : reduceClass;
-		
-		outputKeyClass = outputKeyClass == null ? getClass(secondConf.getOutputKeyClass(), secondConf.getArtifactJar()) : outputKeyClass;
-		outputValClass = outputValClass == null ? getClass(secondConf.getOutputValueClass(), secondConf.getArtifactJar()) : outputValClass;
-
-		jobName = jobName == null ? secondConf.getJobName() : jobName;
-		inputPath = inputPath == null ? secondConf.getInputPath() : inputPath;
-		outputPath = outputPath == null ? secondConf.getOutputPath() : outputPath;
+		String jobName = primaryConf.getJobName();
+		String inputPath = primaryConf.getInputPath();
+		String outputPath = primaryConf.getOutputPath();
 
 		// validate necessary components
 		if (mapClass == null || reduceClass == null || outputKeyClass == null || outputValClass == null
@@ -86,8 +76,7 @@ public class GenJobRunner extends Configured implements Tool {
 		job.setJarByClass(GenJobRunner.class);
 		
 		// transfer artifacts to HDFS
-		addArtifact(masterConf, tmpLibPath, job);
-		addArtifact(secondConf, tmpLibPath, job);
+		addArtifacts(primaryConf, tmpLibPath, job);
 				
 		job.setJobName(jobName);
 
@@ -112,27 +101,31 @@ public class GenJobRunner extends Configured implements Tool {
 		return exitCode;
 	}
 
-	private static void addArtifact(GenJobConfiguration conf, Path dest, Job job) throws IOException {
+	private static void addArtifacts(GenJobConfiguration conf, Path dest, Job job) throws IOException {
 		FileSystem fs = FileSystem.get(job.getConfiguration());
 		fs.mkdirs(dest);
-		if (conf.getArtifactJar() != null) {
-			Path toCopy = new Path(conf.getArtifactJar());
+		for (String jar : conf.getArtifactJars()) {
+			Path toCopy = new Path(jar);
 			fs.copyFromLocalFile(toCopy, dest);
 			job.addFileToClassPath(Path.mergePaths(dest, new Path("/" + toCopy.getName())));
 		}
 	}
 
-	private static Class<?> getClass(String name, String jarPath) {
+	private static Class<?> getClass(String name, Set<String> jarPaths) {
 		if (name == null) {
 			return null;
 		}
 		try {
 			Class<?> clazz = null;
 			
-			if (jarPath == null) {
+			if (jarPaths.size() == 0) {
 				clazz = Class.forName(name);
 			} else {
-				URL[] urls = {(new File(jarPath)).toURI().toURL()};
+				URL[] urls = new URL[jarPaths.size()];
+				int i = 0;
+				for (String jarPath : jarPaths) {
+					 urls[i++] = (new File(jarPath)).toURI().toURL();
+				}
 				URLClassLoader loader = new URLClassLoader(urls, GenJobRunner.class.getClassLoader());
 				clazz = Class.forName(name, true, loader);
 			}
