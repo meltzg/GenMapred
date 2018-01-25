@@ -132,7 +132,7 @@ public class GenJobRunner extends Configured implements Tool {
 			if (jarPath == null) {
 				clazz = Class.forName(name);
 			} else {
-				URL[] urls = {(new File(jarPath)).toURL()};
+				URL[] urls = {(new File(jarPath)).toURI().toURL()};
 				URLClassLoader loader = new URLClassLoader(urls, GenJobRunner.class.getClassLoader());
 				clazz = Class.forName(name, true, loader);
 			}
