@@ -37,7 +37,7 @@ inputPath | job input path | ```true``` |
 outputPath | job output path | ```true``` | 
 outputKeyClass | fully qualified output key class name | ```true``` | 
 outputValueClass | fully qualified output value class name | ```true``` | 
-artifactJars | '|' delimited list of fully qualified jar paths | ```false``` | Is only required if configured classes are not already in the Hadoop Classpath
+artifactJars | '\|' delimited list of fully qualified jar paths | ```false``` | Is only required if configured classes are not already in the Hadoop Classpath
 
 
 #### Notes
