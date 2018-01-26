@@ -5,183 +5,109 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.Map.Entry;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.XmlAnyElement;
-import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlValue;
 import javax.xml.transform.stream.StreamSource;
-
-import org.w3c.dom.Node;
 
 @XmlRootElement
 public class GenJobConfiguration {
 	
-	private Set<String> artifactJars = new HashSet<String>();
+	public static final String JOB_NAME = "jobName";
+	public static final String MAP_CLASS = "mapperClass";
+	public static final String COMBINER_CLASS = "combinerClass";
+	public static final String REDUCER_CLASS = "reducerClass";
+	public static final String INPUT_PATH = "inputPath";
+	public static final String OUTPUT_PATH = "outputPath";
+	public static final String OUTPUT_KEY_CLASS = "outputKeyClass";
+	public static final String OUTPUT_VALUE_CLASS = "outputValueClass";
+	public static final String ARTIFACT_JAR_PATHS = "artifactJars";	
 	
-	private String jobName;
-	
-	private String mapClass;
-	private String combinerClass;
-	private String reduceClass;
-	
-	private String outputKeyClass;
-	private String outputValueClass;
-	
-	private String inputPath;
-	private String outputPath;
-	
-	private Map<String, ListWrapper> customConfs = new HashMap<String, ListWrapper>();
-	
-	@XmlElementWrapper
-	@XmlElement(name="artifactJar")
-	public Set<String> getArtifactJars() {
-		return artifactJars;
-	}
-
-	public void setArtifactJars(Set<String> artifactJars) {
-		this.artifactJars = artifactJars;
-	}
-
-	@XmlElement
-	public String getJobName() {
-		return jobName;
-	}
-
-	public void setJobName(String jobName) {
-		this.jobName = jobName;
-	}
-
-	@XmlElement
-	public String getMapClass() {
-		return mapClass;
-	}
-
-	public void setMapClass(String mapClass) {
-		this.mapClass = mapClass;
-	}
-
-	@XmlElement
-	public String getCombinerClass() {
-		return combinerClass;
-	}
-
-	public void setCombinerClass(String combinerClass) {
-		this.combinerClass = combinerClass;
-	}
-
-	@XmlElement
-	public String getReduceClass() {
-		return reduceClass;
-	}
-
-	public void setReduceClass(String reduceClass) {
-		this.reduceClass = reduceClass;
-	}
-
-	@XmlElement
-	public String getOutputKeyClass() {
-		return outputKeyClass;
-	}
-
-	public void setOutputKeyClass(String outputKeyClass) {
-		this.outputKeyClass = outputKeyClass;
-	}
-
-	@XmlElement
-	public String getOutputValueClass() {
-		return outputValueClass;
-	}
-
-	public void setOutputValueClass(String outputValueClass) {
-		this.outputValueClass = outputValueClass;
-	}
-
-	@XmlElement
-	public String getInputPath() {
-		return inputPath;
-	}
-
-	public void setInputPath(String inputPath) {
-		this.inputPath = inputPath;
-	}
-
-	@XmlElement
-	public String getOutputPath() {
-		return outputPath;
-	}
-
-	public void setOutputPath(String outputPath) {
-		this.outputPath = outputPath;
-	}
+	private Map<String, PropValue> configProps = new HashMap<String, PropValue>();
 
 	@XmlElementWrapper
-	public Map<String, ListWrapper> getCustomConfs() {
-		return customConfs;
+	public Map<String, PropValue> getconfigProps () {
+		return configProps;
 	}
 
-	public void setCustomConfs(Map<String, ListWrapper> customConfs) {
-		this.customConfs = customConfs;
+	public void setCustomConfs(Map<String, PropValue> configProps) {
+		this.configProps = configProps;
+	}
+		
+	public String getProp(String prop) {
+		PropValue propVal = configProps.get(prop);
+		String val = null;
+		
+		if (propVal != null) {
+			val = propVal.getVal();
+		}
+
+		return val;
+	}
+
+	public String[] getPropSplit(String prop) {
+		PropValue val = configProps.get(prop);
+		String[] vals = new String[0];
+		
+		if (val != null) {
+			vals = val.split();
+		}
+		
+		return vals;
 	}
 	
+	public String[] getPropSplit(String prop, String regex) {
+		PropValue val = configProps.get(prop);
+		String[] vals = new String[0];
+		
+		if (val != null) {
+			vals = val.split(regex);
+		}
+		
+		return vals;
+	}
+
 	public void merge(GenJobConfiguration secondary) {
-		artifactJars.addAll(secondary.artifactJars);
 		
-		if (jobName == null) {
-			jobName = secondary.jobName;
-		}
-		if (mapClass == null) {
-			mapClass = secondary.mapClass;
-		}
-		if (combinerClass == null) {
-			combinerClass = secondary.combinerClass;
-		}
-		if (reduceClass == null) {
-			reduceClass = secondary.reduceClass;
-		}
-		if (outputKeyClass == null) {
-			outputKeyClass = secondary.outputKeyClass;
-		}
-		if (outputValueClass == null) {
-			outputValueClass = secondary.outputValueClass;
-		}
-		if (inputPath == null) {
-			inputPath = secondary.inputPath;
-		}
-		if (outputPath == null) {
-			outputPath = secondary.outputPath;
-		}
-		
-		for (Map.Entry<String, ListWrapper> customConf : secondary.customConfs.entrySet()) {
-			if (!customConfs.containsKey(customConf.getKey())) {
-				customConfs.put(customConf.getKey(), new ListWrapper());
-			}
-			for (Object o : customConf.getValue().getList()) {
-				customConfs.get(customConf.getKey()).getList().add(o);
+		for (Entry<String, PropValue> configProp : secondary.configProps.entrySet()) {
+			if (!configProps.containsKey(configProp.getKey())) {
+				configProps.put(configProp.getKey(), configProp.getValue());
+			} else {
+				configProps.get(configProp.getKey()).append(configProp.getValue().getVal());
 			}
 		}
 	}
-
+	
+	public void marshal(String file) throws ClassNotFoundException, JAXBException, FileNotFoundException {
+		toOutputStream(new FileOutputStream(file));
+	}
+	
+	public String toXMLString() throws ClassNotFoundException, JAXBException {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		toOutputStream(baos);
+		return baos.toString();
+	}
+	
+	private void toOutputStream(OutputStream os) throws ClassNotFoundException, JAXBException {
+		JAXBContext context = JAXBContext.newInstance(GenJobConfiguration.class);
+		Marshaller marshaller = context.createMarshaller();
+		
+		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+		marshaller.marshal(this, os);
+	}
+	
 	@Override
 	public String toString() {
-		return "GenJobConfiguration [artifactJars=" + artifactJars + ", jobName=" + jobName + ", mapClass=" + mapClass
-				+ ", combinerClass=" + combinerClass + ", reduceClass=" + reduceClass + ", outputKeyClass="
-				+ outputKeyClass + ", outputValueClass=" + outputValueClass + ", inputPath=" + inputPath
-				+ ", outputPath=" + outputPath + ", customConfs=" + customConfs + "]";
-	}
-	
-	public static void marshal(GenJobConfiguration conf, String file) throws ClassNotFoundException, JAXBException, FileNotFoundException {
-		toOutputStream(conf, new FileOutputStream(file));
+		return "GenJobConfiguration [configProps=" + configProps + "]";
 	}
 	
 	public static GenJobConfiguration unmarshal(String file) throws JAXBException, ClassNotFoundException {
@@ -190,65 +116,87 @@ public class GenJobConfiguration {
 		Unmarshaller unmarshaller = context.createUnmarshaller();
 		GenJobConfiguration conf = unmarshaller.unmarshal(new StreamSource(new File(file)), GenJobConfiguration.class).getValue();
 		
-		List<Class<?>> ctxtClasses = new ArrayList<Class<?>>();
-		for (String clazz : conf.getCustomConfs().keySet()) {
-			ctxtClasses.add(Class.forName(clazz));
-		}
-		Class<?>[] ctxtClassArr = new Class<?>[ctxtClasses.size()];
-		ctxtClassArr = ctxtClasses.toArray(ctxtClassArr);
-		
-		context = JAXBContext.newInstance(ctxtClassArr);
-		unmarshaller = context.createUnmarshaller();
-		
-		for (Map.Entry<String, ListWrapper> entry : conf.getCustomConfs().entrySet()) {
-			for (int i = 0; i < entry.getValue().getList().size(); i++) {
-				entry.getValue().getList().set(i, unmarshaller.unmarshal((Node) entry.getValue().getList().get(i)));
-			}
-		}
-		
 		return conf;
 	}
-	
-	public static String toXMLString(GenJobConfiguration conf) throws ClassNotFoundException, JAXBException {
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		toOutputStream(conf, baos);
-		return baos.toString();
-	}
-	
-	private static void toOutputStream(GenJobConfiguration conf, OutputStream os) throws ClassNotFoundException, JAXBException {
-		List<Class<?>> ctxtClasses = new ArrayList<Class<?>>();
-		ctxtClasses.add(GenJobConfiguration.class);
-		for (String clazz : conf.getCustomConfs().keySet()) {
-			ctxtClasses.add(Class.forName(clazz));
+
+	@XmlRootElement
+	public static class PropValue {
+		
+		public static final char VAL_DELIMITER = '|'; 
+		
+		private String val;
+		private boolean isAppendable;
+		
+		public PropValue() {
+			this(null, false);
 		}
 		
-		Class<?>[] ctxtClassArr = new Class<?>[ctxtClasses.size()];
-		ctxtClassArr = ctxtClasses.toArray(ctxtClassArr);
+		public PropValue(String val) {
+			this(val, false);
+		}
 		
-		JAXBContext context = JAXBContext.newInstance(ctxtClassArr);
-		Marshaller marshaller = context.createMarshaller();
-		
-		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-		marshaller.marshal(conf, os);
-	}
-	
-	public static class ListWrapper {
-		
-		private List<Object> list = new ArrayList<Object>();
-		
-		@XmlAnyElement
-		public List<Object> getList() {
-			return list;
+		public PropValue(String val, boolean isAppendable) {
+			super();
+			this.val = val;
+			this.isAppendable = isAppendable;
 		}
 
-		public void setList(List<Object> list) {
-			this.list = list;
+		@XmlValue
+		public String getVal() {
+			return val;
+		}
+		public void setVal(String val) {
+			this.val = val;
+		}
+		
+		@XmlAttribute
+		public boolean isAppendable() {
+			return isAppendable;
+		}
+		public void setAppendable(boolean isAppendable) {
+			this.isAppendable = isAppendable;
+		}
+		
+		public boolean append(String val) {
+			if (isAppendable) {
+				this.val += VAL_DELIMITER + val;
+				return true;
+			}
+			return false;
+		}
+		
+		public String[] split(String regex) {
+			return val.split(regex);
+		}
+		
+		public String[] split() {
+			return split("\\" + VAL_DELIMITER);
 		}
 		
 		@Override
 		public String toString() {
-			return "ListWrapper [list=" + list + "]";
-		}
-
+			return "PropValue [val=" + val + ", isAppendable=" + isAppendable + "]";
+		}		
+	}
+	
+	public static void main(String[] args) throws ClassNotFoundException, FileNotFoundException, JAXBException {
+		GenJobConfiguration conf = new GenJobConfiguration();
+		
+		conf.getconfigProps().put(GenJobConfiguration.JOB_NAME, new PropValue("test"));
+		conf.getconfigProps().put(GenJobConfiguration.MAP_CLASS, new PropValue("org.meltzg.genmapred.examples.ModelCountMapper"));
+		conf.getconfigProps().put(GenJobConfiguration.REDUCER_CLASS, new PropValue("org.meltzg.genmapred.examples.ModelCountReducer"));
+		conf.getconfigProps().put(GenJobConfiguration.OUTPUT_KEY_CLASS, new PropValue("org.apache.hadoop.io.Text"));
+		conf.getconfigProps().put(GenJobConfiguration.OUTPUT_VALUE_CLASS, new PropValue("org.apache.hadoop.io.IntWritable"));
+		conf.getconfigProps().put(GenJobConfiguration.OUTPUT_PATH, new PropValue("/activity-res"));
+		conf.getconfigProps().put(GenJobConfiguration.INPUT_PATH, new PropValue("/activity/*/*accelerometer*"));
+		conf.getconfigProps().put(GenJobConfiguration.ARTIFACT_JAR_PATHS, new PropValue("asdf.jar", true));
+		conf.getconfigProps().get(GenJobConfiguration.ARTIFACT_JAR_PATHS).append("qwer.jar");
+		
+		conf.getconfigProps().put("foo", new PropValue("foobar", false));
+		
+		conf.marshal("conf.xml");
+		GenJobConfiguration conf2 = GenJobConfiguration.unmarshal("conf.xml");
+		
+		System.out.println(conf2.toXMLString());
 	}
 }

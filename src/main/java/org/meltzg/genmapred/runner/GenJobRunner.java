@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -46,24 +48,27 @@ public class GenJobRunner extends Configured implements Tool {
 		
 		primaryConf.merge(secondaryConf);
 		System.out.println("Marged configurations:");
-		System.out.println(GenJobConfiguration.toXMLString(primaryConf));
+		System.out.println(primaryConf.toXMLString());
 		
 		Class<?> tmp;
 
 		// Set classes and configurations from the merged primary and secondary confs
-		tmp = getClass(primaryConf.getMapClass(), primaryConf.getArtifactJars());
+		String[] jarPaths = primaryConf.getPropSplit(GenJobConfiguration.ARTIFACT_JAR_PATHS);
+		Set<String> jarSet = new HashSet<String>(Arrays.asList(jarPaths));
+		
+		tmp = getClass(primaryConf.getProp(GenJobConfiguration.MAP_CLASS), jarSet);
 		Class<? extends Mapper> mapClass = tmp != null ? tmp.asSubclass(Mapper.class) : null;
-		tmp = getClass(primaryConf.getCombinerClass(), primaryConf.getArtifactJars());
+		tmp = getClass(primaryConf.getProp(GenJobConfiguration.COMBINER_CLASS), jarSet);
 		Class<? extends Reducer> combinerClass = tmp != null ? tmp.asSubclass(Reducer.class) : null;
-		tmp = getClass(primaryConf.getReduceClass(), primaryConf.getArtifactJars());
+		tmp = getClass(primaryConf.getProp(GenJobConfiguration.REDUCER_CLASS), jarSet);
 		Class<? extends Reducer> reduceClass = tmp != null ? tmp.asSubclass(Reducer.class) : null;
 		
-		Class<?> outputKeyClass = getClass(primaryConf.getOutputKeyClass(), primaryConf.getArtifactJars());
-		Class<?> outputValClass = getClass(primaryConf.getOutputValueClass(), primaryConf.getArtifactJars());
+		Class<?> outputKeyClass = getClass(primaryConf.getProp(GenJobConfiguration.OUTPUT_KEY_CLASS), jarSet);
+		Class<?> outputValClass = getClass(primaryConf.getProp(GenJobConfiguration.OUTPUT_VALUE_CLASS), jarSet);
 
-		String jobName = primaryConf.getJobName();
-		String inputPath = primaryConf.getInputPath();
-		String outputPath = primaryConf.getOutputPath();
+		String jobName = primaryConf.getProp(GenJobConfiguration.JOB_NAME);
+		String inputPath = primaryConf.getProp(GenJobConfiguration.INPUT_PATH);
+		String outputPath = primaryConf.getProp(GenJobConfiguration.OUTPUT_PATH);
 
 		// validate necessary components
 		if (mapClass == null || reduceClass == null || outputKeyClass == null || outputValClass == null
@@ -104,7 +109,7 @@ public class GenJobRunner extends Configured implements Tool {
 	private static void addArtifacts(GenJobConfiguration conf, Path dest, Job job) throws IOException {
 		FileSystem fs = FileSystem.get(job.getConfiguration());
 		fs.mkdirs(dest);
-		for (String jar : conf.getArtifactJars()) {
+		for (String jar : conf.getPropSplit(GenJobConfiguration.ARTIFACT_JAR_PATHS)) {
 			Path toCopy = new Path(jar);
 			fs.copyFromLocalFile(toCopy, dest);
 			job.addFileToClassPath(Path.mergePaths(dest, new Path("/" + toCopy.getName())));

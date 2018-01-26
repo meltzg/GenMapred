@@ -1,20 +1,11 @@
 <xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:element name="genJobConfiguration" type="genJobConfigurationType"/>
-  <xs:complexType name="artifactJarsType">
-    <xs:sequence>
-      <xs:element type="xs:string" name="artifactJar" maxOccurs="unbounded" minOccurs="0"/>
-    </xs:sequence>
-  </xs:complexType>
-  <xs:complexType name="exampleCustomConfType">
-    <xs:sequence>
-      <xs:element type="xs:short" name="bar"/>
-      <xs:element type="xs:string" name="foo"/>
-    </xs:sequence>
-  </xs:complexType>
   <xs:complexType name="valueType">
-    <xs:sequence>
-      <xs:element type="exampleCustomConfType" name="exampleCustomConf" maxOccurs="unbounded" minOccurs="0"/>
-    </xs:sequence>
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:string" name="appendable" use="optional" default="false"/>
+      </xs:extension>
+    </xs:simpleContent>
   </xs:complexType>
   <xs:complexType name="entryType">
     <xs:sequence>
@@ -22,22 +13,14 @@
       <xs:element type="valueType" name="value"/>
     </xs:sequence>
   </xs:complexType>
-  <xs:complexType name="customConfsType">
+  <xs:complexType name="configPropsType">
     <xs:sequence>
-      <xs:element type="entryType" name="entry"/>
+      <xs:element type="entryType" name="entry" maxOccurs="unbounded" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
   <xs:complexType name="genJobConfigurationType">
     <xs:sequence>
-      <xs:element type="artifactJarsType" name="artifactJars"/>
-      <xs:element type="customConfsType" name="customConfs"/>
-      <xs:element type="xs:string" name="inputPath"/>
-      <xs:element type="xs:string" name="jobName"/>
-      <xs:element type="xs:string" name="mapClass"/>
-      <xs:element type="xs:string" name="outputKeyClass"/>
-      <xs:element type="xs:string" name="outputPath"/>
-      <xs:element type="xs:string" name="outputValueClass"/>
-      <xs:element type="xs:string" name="reduceClass"/>
+      <xs:element type="configPropsType" name="configProps"/>
     </xs:sequence>
   </xs:complexType>
 </xs:schema>
