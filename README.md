@@ -17,11 +17,20 @@ gradle clean build
 hadoop jar GenMapred.jar org.meltzg.genmapred.runner.GenJobRunner primary.xml [secondary.xml]
 ```
 
-The GenJobRunner is a configurable Hadoop MapReduce Job runner.  It can be configured using the values in the primary and, optionally, the secondary xml files.  Values in the primary, WILL NOT be overridden by values in the secondary.  Properties in the primary whose value has the ```appendable``` attribute set to "true" will have the secondary's value appended with the GenJobConfiguration.PropValue.VAL_DELIMITER.
+The GenJobRunner is a configurable Hadoop MapReduce Job runner.  It can be configured using the values in the primary and, optionally, the secondary JSON files.  Values in the primary, WILL NOT be overridden by values in the secondary.  Properties in the primary whose value has the ```appendable``` sub-property set to "true" will have the secondary's value appended with the GenJobConfiguration.PropValue.VAL_DELIMITER.
 
 ### Configuration Schema
 
-The schema definition can be found [here](./src/main/resources/GenJobConfiguration.xsd).
+```JSON
+{
+	"configProps": {
+		"propertyName": {
+			"val": "property value",
+			"isAppendable": false
+		}
+	}
+}
+```
 
 ### GenJobRunner Standard Configuration Options
 
@@ -44,3 +53,105 @@ artifactJars | '\|' delimited list of fully qualified jar paths | ```false``` | 
  - The ```artifactJars``` property must have jar paths separated by '|'
  - The values for class name properties must be the fully qualified class names for the classes you want to use.
  - As of right now, these custom configuration objects are not available to the MapReduce components
+ 
+### Example Donfigurations
+
+#### Primary.json
+
+```JSON
+{
+	"configProps": {
+		"jobName": {
+			"val": "test",
+			"isAppendable": false
+		},
+		"outputValueClass": {
+			"val": "org.apache.hadoop.io.IntWritable",
+			"isAppendable": false
+		},
+		"inputPath": {
+			"val": "/activity/*/*accelerometer*",
+			"isAppendable": false
+		},
+		"outputPath": {
+			"val": "/activity-res",
+			"isAppendable": false
+		},
+		"foo": {
+			"val": "foobar",
+			"isAppendable": false
+		},
+		"outputKeyClass": {
+			"val": "org.apache.hadoop.io.Text",
+			"isAppendable": false
+		}
+	}
+}
+```
+
+#### Secondary.json
+
+```JSON
+{
+	"configProps": {
+		"artifactJars": {
+			"val": "/home/hduser/playground/examples.jar",
+			"isAppendable": true
+		},
+		"reducerClass": {
+			"val": "org.meltzg.genmapred.examples.ModelCountReducer",
+			"isAppendable": false
+		},
+		"mapperClass": {
+			"val": "org.meltzg.genmapred.examples.ModelCountMapper",
+			"isAppendable": false
+		}
+	}
+}
+```
+
+#### Final configuration
+The primary and secondary configurations will be merged into the following JSON object
+
+```JSON
+{
+	"configProps": {
+		"jobName": {
+			"val": "test",
+			"isAppendable": false
+		},
+		"outputValueClass": {
+			"val": "org.apache.hadoop.io.IntWritable",
+			"isAppendable": false
+		},
+		"inputPath": {
+			"val": "/activity/*/*accelerometer*",
+			"isAppendable": false
+		},
+		"outputPath": {
+			"val": "/activity-res",
+			"isAppendable": false
+		},
+		"foo": {
+			"val": "foobar",
+			"isAppendable": false
+		},
+		"outputKeyClass": {
+			"val": "org.apache.hadoop.io.Text",
+			"isAppendable": false
+		},
+		"artifactJars": {
+			"val": "/home/hduser/playground/examples.jar",
+			"isAppendable": true
+		},
+		"reducerClass": {
+			"val": "org.meltzg.genmapred.examples.ModelCountReducer",
+			"isAppendable": false
+		},
+		"mapperClass": {
+			"val": "org.meltzg.genmapred.examples.ModelCountMapper",
+			"isAppendable": false
+		}
+	}
+}
+```

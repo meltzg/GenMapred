@@ -1,25 +1,16 @@
 package org.meltzg.genmapred.conf;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElementWrapper;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlValue;
-import javax.xml.transform.stream.StreamSource;
+import com.google.gson.Gson;
 
-@XmlRootElement
 public class GenJobConfiguration {
 	
 	public static final String JOB_NAME = "jobName";
@@ -34,7 +25,6 @@ public class GenJobConfiguration {
 	
 	private Map<String, PropValue> configProps = new HashMap<String, PropValue>();
 
-	@XmlElementWrapper
 	public Map<String, PropValue> getconfigProps () {
 		return configProps;
 	}
@@ -87,22 +77,19 @@ public class GenJobConfiguration {
 		}
 	}
 	
-	public void marshal(String file) throws ClassNotFoundException, JAXBException, FileNotFoundException {
-		toOutputStream(new FileOutputStream(file));
+	public void marshal(String file) throws IOException {
+		FileOutputStream fs = new FileOutputStream(file);
+		toOutputStream(fs);
+		fs.close();
 	}
 	
-	public String toXMLString() throws ClassNotFoundException, JAXBException {
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		toOutputStream(baos);
-		return baos.toString();
+	public String toJSONString() {
+		Gson gson = new Gson();
+		return gson.toJson(this);
 	}
 	
-	private void toOutputStream(OutputStream os) throws ClassNotFoundException, JAXBException {
-		JAXBContext context = JAXBContext.newInstance(GenJobConfiguration.class);
-		Marshaller marshaller = context.createMarshaller();
-		
-		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-		marshaller.marshal(this, os);
+	private void toOutputStream(OutputStream os) throws IOException {
+		os.write(toJSONString().getBytes());
 	}
 	
 	@Override
@@ -110,16 +97,14 @@ public class GenJobConfiguration {
 		return "GenJobConfiguration [configProps=" + configProps + "]";
 	}
 	
-	public static GenJobConfiguration unmarshal(String file) throws JAXBException, ClassNotFoundException {
-		JAXBContext context = JAXBContext.newInstance(GenJobConfiguration.class);
-		
-		Unmarshaller unmarshaller = context.createUnmarshaller();
-		GenJobConfiguration conf = unmarshaller.unmarshal(new StreamSource(new File(file)), GenJobConfiguration.class).getValue();
-		
+	public static GenJobConfiguration unmarshal(String file) throws IOException  {
+		Gson gson = new Gson();
+		String strConf = new String(Files.readAllBytes(Paths.get(file)));
+		GenJobConfiguration conf = gson.fromJson(strConf, GenJobConfiguration.class);
+
 		return conf;
 	}
 
-	@XmlRootElement
 	public static class PropValue {
 		
 		public static final char VAL_DELIMITER = '|'; 
@@ -141,7 +126,6 @@ public class GenJobConfiguration {
 			this.isAppendable = isAppendable;
 		}
 
-		@XmlValue
 		public String getVal() {
 			return val;
 		}
@@ -149,7 +133,6 @@ public class GenJobConfiguration {
 			this.val = val;
 		}
 		
-		@XmlAttribute
 		public boolean isAppendable() {
 			return isAppendable;
 		}
@@ -179,7 +162,7 @@ public class GenJobConfiguration {
 		}		
 	}
 	
-	public static void main(String[] args) throws ClassNotFoundException, FileNotFoundException, JAXBException {
+	public static void main(String[] args) throws IOException {
 		GenJobConfiguration conf = new GenJobConfiguration();
 		
 		conf.getconfigProps().put(GenJobConfiguration.JOB_NAME, new PropValue("test"));
@@ -194,9 +177,13 @@ public class GenJobConfiguration {
 		
 		conf.getconfigProps().put("foo", new PropValue("foobar", false));
 		
-		conf.marshal("conf.xml");
-		GenJobConfiguration conf2 = GenJobConfiguration.unmarshal("conf.xml");
+		conf.marshal("conf.json");
+		GenJobConfiguration conf2 = GenJobConfiguration.unmarshal("conf.json");
 		
-		System.out.println(conf2.toXMLString());
+		System.out.println(conf2.toJSONString());
+		
+//		Gson gson = new Gson();
+//		String confStr = gson.toJson(conf);
+//		System.out.println(confStr);
 	}
 }

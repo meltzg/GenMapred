@@ -10,8 +10,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.xml.bind.JAXBException;
-
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -38,17 +36,12 @@ public class GenJobRunner extends Configured implements Tool {
 		
 		Path tmpLibPath = new Path("/tmp/artifacts/" + UUID.randomUUID().toString());
 
-		try {
-			primaryConf = GenJobConfiguration.unmarshal(args[0]);
-			secondaryConf = args.length == 2 ? GenJobConfiguration.unmarshal(args[1]) : secondaryConf;
-		} catch (ClassNotFoundException | JAXBException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		primaryConf = GenJobConfiguration.unmarshal(args[0]);
+		secondaryConf = args.length == 2 ? GenJobConfiguration.unmarshal(args[1]) : secondaryConf;
 		
 		primaryConf.merge(secondaryConf);
 		System.out.println("Marged configurations:");
-		System.out.println(primaryConf.toXMLString());
+		System.out.println(primaryConf.toJSONString());
 		
 		Class<?> tmp;
 
