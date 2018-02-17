@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/meltzg/GenMapred.svg?branch=master)](https://travis-ci.org/meltzg/GenMapred)
+[![codecov](https://codecov.io/gh/meltzg/GenMapred/branch/master/graph/badge.svg)](https://codecov.io/gh/meltzg/GenMapred)
 
 # GenMapred
 A generic and configurable job runner for Hadoop Mapreduce
