@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/meltzg/GenMapred.svg?branch=master)](https://travis-ci.org/meltzg/GenMapred)
+
 # GenMapred
 A generic and configurable job runner for Hadoop Mapreduce
 
@@ -23,11 +25,9 @@ The GenJobRunner is a configurable Hadoop MapReduce Job runner.  It can be confi
 
 ```JSON
 {
-	"configProps": {
-		"propertyName": {
-			"val": "property value",
-			"isAppendable": false
-		}
+	"propertyName": {
+		"val": "property value",
+		"isAppendable": false
 	}
 }
 ```
@@ -60,31 +60,29 @@ artifactJars | '\|' delimited list of fully qualified jar paths | ```false``` | 
 
 ```JSON
 {
-	"configProps": {
-		"jobName": {
-			"val": "test",
-			"isAppendable": false
-		},
-		"outputValueClass": {
-			"val": "org.apache.hadoop.io.IntWritable",
-			"isAppendable": false
-		},
-		"inputPath": {
-			"val": "/activity/*/*accelerometer*",
-			"isAppendable": false
-		},
-		"outputPath": {
-			"val": "/activity-res",
-			"isAppendable": false
-		},
-		"foo": {
-			"val": "foobar",
-			"isAppendable": false
-		},
-		"outputKeyClass": {
-			"val": "org.apache.hadoop.io.Text",
-			"isAppendable": false
-		}
+	"jobName": {
+		"val": "test",
+		"isAppendable": false
+	},
+	"outputValueClass": {
+		"val": "org.apache.hadoop.io.IntWritable",
+		"isAppendable": false
+	},
+	"inputPath": {
+		"val": "/activity/*/*accelerometer*",
+		"isAppendable": false
+	},
+	"outputPath": {
+		"val": "/activity-res",
+		"isAppendable": false
+	},
+	"foo": {
+		"val": "foobar",
+		"isAppendable": false
+	},
+	"outputKeyClass": {
+		"val": "org.apache.hadoop.io.Text",
+		"isAppendable": false
 	}
 }
 ```
@@ -93,19 +91,17 @@ artifactJars | '\|' delimited list of fully qualified jar paths | ```false``` | 
 
 ```JSON
 {
-	"configProps": {
-		"artifactJars": {
-			"val": "/home/hduser/playground/examples.jar",
-			"isAppendable": true
-		},
-		"reducerClass": {
-			"val": "org.meltzg.genmapred.examples.ModelCountReducer",
-			"isAppendable": false
-		},
-		"mapperClass": {
-			"val": "org.meltzg.genmapred.examples.ModelCountMapper",
-			"isAppendable": false
-		}
+	"artifactJars": {
+		"val": "/home/hduser/playground/examples.jar",
+		"isAppendable": true
+	},
+	"reducerClass": {
+		"val": "org.meltzg.genmapred.examples.ModelCountReducer",
+		"isAppendable": false
+	},
+	"mapperClass": {
+		"val": "org.meltzg.genmapred.examples.ModelCountMapper",
+		"isAppendable": false
 	}
 }
 ```
@@ -115,43 +111,41 @@ The primary and secondary configurations will be merged into the following JSON 
 
 ```JSON
 {
-	"configProps": {
-		"jobName": {
-			"val": "test",
-			"isAppendable": false
-		},
-		"outputValueClass": {
-			"val": "org.apache.hadoop.io.IntWritable",
-			"isAppendable": false
-		},
-		"inputPath": {
-			"val": "/activity/*/*accelerometer*",
-			"isAppendable": false
-		},
-		"outputPath": {
-			"val": "/activity-res",
-			"isAppendable": false
-		},
-		"foo": {
-			"val": "foobar",
-			"isAppendable": false
-		},
-		"outputKeyClass": {
-			"val": "org.apache.hadoop.io.Text",
-			"isAppendable": false
-		},
-		"artifactJars": {
-			"val": "/home/hduser/playground/examples.jar",
-			"isAppendable": true
-		},
-		"reducerClass": {
-			"val": "org.meltzg.genmapred.examples.ModelCountReducer",
-			"isAppendable": false
-		},
-		"mapperClass": {
-			"val": "org.meltzg.genmapred.examples.ModelCountMapper",
-			"isAppendable": false
-		}
+	"jobName": {
+		"val": "test",
+		"isAppendable": false
+	},
+	"outputValueClass": {
+		"val": "org.apache.hadoop.io.IntWritable",
+		"isAppendable": false
+	},
+	"inputPath": {
+		"val": "/activity/*/*accelerometer*",
+		"isAppendable": false
+	},
+	"outputPath": {
+		"val": "/activity-res",
+		"isAppendable": false
+	},
+	"foo": {
+		"val": "foobar",
+		"isAppendable": false
+	},
+	"outputKeyClass": {
+		"val": "org.apache.hadoop.io.Text",
+		"isAppendable": false
+	},
+	"artifactJars": {
+		"val": "/home/hduser/playground/examples.jar",
+		"isAppendable": true
+	},
+	"reducerClass": {
+		"val": "org.meltzg.genmapred.examples.ModelCountReducer",
+		"isAppendable": false
+	},
+	"mapperClass": {
+		"val": "org.meltzg.genmapred.examples.ModelCountMapper",
+		"isAppendable": false
 	}
 }
 ```

@@ -36,8 +36,10 @@ public class GenJobRunner extends Configured implements Tool {
 		
 		Path tmpLibPath = new Path("/tmp/artifacts/" + UUID.randomUUID().toString());
 
-		primaryConf = GenJobConfiguration.unmarshal(args[0]);
-		secondaryConf = args.length == 2 ? GenJobConfiguration.unmarshal(args[1]) : secondaryConf;
+		primaryConf.unmarshal(args[0]);
+		if (args.length == 2) {
+			secondaryConf.unmarshal(args[1]);
+		}
 		
 		primaryConf.merge(secondaryConf);
 		System.out.println("Marged configurations:");
@@ -66,7 +68,7 @@ public class GenJobRunner extends Configured implements Tool {
 		// validate necessary components
 		if (mapClass == null || reduceClass == null || outputKeyClass == null || outputValClass == null
 				|| jobName == null || inputPath == null || outputPath == null) {
-			throw new IllegalStateException("Generic job ocnfigurations are missing necessary components!");
+			throw new IllegalStateException("Generic job configurations are missing necessary components!");
 		}
 
 		// setup and run job
