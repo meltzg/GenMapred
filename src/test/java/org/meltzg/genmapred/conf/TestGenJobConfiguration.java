@@ -45,5 +45,6 @@ public class TestGenJobConfiguration {
 		}
 		
 		assertEquals("Original should equal new from marshalled copy", conf, conf2);
+		fail("what happens?");
 	}
 }
