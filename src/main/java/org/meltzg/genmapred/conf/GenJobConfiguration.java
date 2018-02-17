@@ -56,14 +56,7 @@ public class GenJobConfiguration {
 	}
 
 	public String[] getPropSplit(String prop) {
-		PropValue val = configProps.get(prop);
-		String[] vals = new String[0];
-
-		if (val != null) {
-			vals = val.split();
-		}
-
-		return vals;
+		return getPropSplit(prop, PropValue.VAL_DELIMITER_REGEX);
 	}
 
 	public String[] getPropSplit(String prop, String regex) {
@@ -148,6 +141,7 @@ public class GenJobConfiguration {
 	public static class PropValue {
 
 		public static final char VAL_DELIMITER = '|';
+		public static final String VAL_DELIMITER_REGEX = "\\" + VAL_DELIMITER;
 
 		private String val;
 		private boolean isAppendable;
@@ -195,7 +189,7 @@ public class GenJobConfiguration {
 		}
 
 		public String[] split() {
-			return split("\\" + VAL_DELIMITER);
+			return split(VAL_DELIMITER_REGEX);
 		}
 
 		@Override
@@ -236,33 +230,5 @@ public class GenJobConfiguration {
 		public String toString() {
 			return "PropValue [val=" + val + ", isAppendable=" + isAppendable + "]";
 		}
-	}
-
-	public static void main(String[] args) throws IOException {
-		GenJobConfiguration conf = new GenJobConfiguration();
-
-		conf.getconfigProps().put(GenJobConfiguration.JOB_NAME, new PropValue("test"));
-		conf.getconfigProps().put(GenJobConfiguration.MAP_CLASS,
-				new PropValue("org.meltzg.genmapred.examples.ModelCountMapper"));
-		conf.getconfigProps().put(GenJobConfiguration.REDUCER_CLASS,
-				new PropValue("org.meltzg.genmapred.examples.ModelCountReducer"));
-		conf.getconfigProps().put(GenJobConfiguration.OUTPUT_KEY_CLASS, new PropValue("org.apache.hadoop.io.Text"));
-		conf.getconfigProps().put(GenJobConfiguration.OUTPUT_VALUE_CLASS,
-				new PropValue("org.apache.hadoop.io.IntWritable"));
-		conf.getconfigProps().put(GenJobConfiguration.OUTPUT_PATH, new PropValue("/activity-res"));
-		conf.getconfigProps().put(GenJobConfiguration.INPUT_PATH, new PropValue("/activity/*/*accelerometer*"));
-		conf.getconfigProps().put(GenJobConfiguration.ARTIFACT_JAR_PATHS, new PropValue("asdf.jar", true));
-		conf.getconfigProps().get(GenJobConfiguration.ARTIFACT_JAR_PATHS).append("qwer.jar");
-
-		conf.getconfigProps().put("foo", new PropValue("foobar", false));
-
-		conf.marshal("conf.json");
-		GenJobConfiguration conf2 = new GenJobConfiguration("conf.json");
-
-		System.out.println(conf2.toJSONString());
-
-		// Gson gson = new Gson();
-		// String confStr = gson.toJson(conf);
-		// System.out.println(confStr);
 	}
 }
