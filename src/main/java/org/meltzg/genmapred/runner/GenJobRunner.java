@@ -149,35 +149,6 @@ public class GenJobRunner extends Configured implements Tool {
 		}
 	}
 
-	private static void validateJob(Job job) throws ClassNotFoundException, IllegalStateException {
-		List<String> missing = new ArrayList<String>();
-		if (job.getMapperClass() == null) {
-			missing.add("MapperClass");
-		}
-		if (job.getReducerClass() == null) {
-			missing.add("ReducerClass");
-		}
-		if (job.getOutputKeyClass() == null) {
-			missing.add("OutputKeyClass");
-		}
-		if (job.getOutputValueClass() == null) {
-			missing.add("OutputValueClass");
-		}
-		if (job.getJobName() == null) {
-			missing.add("JobName");
-		}
-		if (FileInputFormat.getInputPaths(job)== null || FileInputFormat.getInputPaths(job).length == 0) {
-			missing.add("InputPaths");
-		}
-		if (FileOutputFormat.getOutputPath(job) == null) {
-			missing.add("OutputPath");
-		}
-		
-		if (missing.size() > 0) {
-			throw new IllegalStateException("Generic job configurations are missing necessary components: " + String.join(", ", missing));
-		}
-	}
-
 	private static void validateJob(Class<? extends Mapper> mapClass, Class<? extends Reducer> reduceClass,
 			Class<?> outputKeyClass, Class<?> outputValClass, String jobName, String inputPath, String outputPath) {
 		List<String> missing = new ArrayList<String>();
