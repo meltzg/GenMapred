@@ -55,6 +55,14 @@ public class GenJobConfiguration {
 		return val;
 	}
 
+	public void setProp(String prop, String val) {
+		setProp(prop, val, false);
+	}
+	
+	public void setProp(String prop, String val, boolean appendable) {
+		configProps.put(prop, new PropValue(val, appendable));
+	}
+
 	public String[] getPropSplit(String prop) {
 		return getPropSplit(prop, PropValue.VAL_DELIMITER_REGEX);
 	}

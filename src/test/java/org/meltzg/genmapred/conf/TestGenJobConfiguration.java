@@ -18,20 +18,17 @@ public class TestGenJobConfiguration {
 		GenJobConfiguration conf = new GenJobConfiguration();
 		GenJobConfiguration conf2 = null;
 
-		conf.getconfigProps().put(GenJobConfiguration.JOB_NAME, new PropValue("test"));
-		conf.getconfigProps().put(GenJobConfiguration.MAP_CLASS,
-				new PropValue("org.meltzg.genmapred.examples.ModelCountMapper"));
-		conf.getconfigProps().put(GenJobConfiguration.REDUCER_CLASS,
-				new PropValue("org.meltzg.genmapred.examples.ModelCountReducer"));
-		conf.getconfigProps().put(GenJobConfiguration.OUTPUT_KEY_CLASS, new PropValue("org.apache.hadoop.io.Text"));
-		conf.getconfigProps().put(GenJobConfiguration.OUTPUT_VALUE_CLASS,
-				new PropValue("org.apache.hadoop.io.IntWritable"));
-		conf.getconfigProps().put(GenJobConfiguration.OUTPUT_PATH, new PropValue("/activity-res"));
-		conf.getconfigProps().put(GenJobConfiguration.INPUT_PATH, new PropValue("/activity/*/*accelerometer*"));
-		conf.getconfigProps().put(GenJobConfiguration.ARTIFACT_JAR_PATHS, new PropValue("asdf.jar", true));
+		conf.setProp(GenJobConfiguration.JOB_NAME, "test");
+		conf.setProp(GenJobConfiguration.MAP_CLASS, "org.meltzg.genmapred.examples.ModelCountMapper");
+		conf.setProp(GenJobConfiguration.REDUCER_CLASS, "org.meltzg.genmapred.examples.ModelCountReducer");
+		conf.setProp(GenJobConfiguration.OUTPUT_KEY_CLASS, "org.apache.hadoop.io.Text");
+		conf.setProp(GenJobConfiguration.OUTPUT_VALUE_CLASS,"org.apache.hadoop.io.IntWritable");
+		conf.setProp(GenJobConfiguration.OUTPUT_PATH, "/activity-res");
+		conf.setProp(GenJobConfiguration.INPUT_PATH, "/activity/*/*accelerometer*");
+		conf.setProp(GenJobConfiguration.ARTIFACT_JAR_PATHS, "asdf.jar", true);
 		conf.getconfigProps().get(GenJobConfiguration.ARTIFACT_JAR_PATHS).append("qwer.jar");
 
-		conf.getconfigProps().put("foo", new PropValue("foobar", false));
+		conf.setProp("foo", "foobar");
 
 		try {
 			conf.marshal("conf.json");
@@ -57,9 +54,9 @@ public class TestGenJobConfiguration {
 		GenJobConfiguration conf2 = new GenJobConfiguration();
 		GenJobConfiguration conf3 = new GenJobConfiguration();
 
-		conf.getconfigProps().put("foo", new PropValue("foobar", false));
-		conf2.getconfigProps().put("foo", new PropValue("foobar", false));
-		conf3.getconfigProps().put("foo", new PropValue("barfoo", false));
+		conf.setProp("foo", "foobar");
+		conf2.setProp("foo", "foobar");
+		conf3.setProp("foo", "barfoo");
 		
 		assertEquals("Same props with same values should be equal.", conf, conf2);
 		assertNotEquals("Same props with different values should not be equal.", conf, conf3);
@@ -68,7 +65,7 @@ public class TestGenJobConfiguration {
 		assertNotEquals("Same props, same value, different appendibility should not be equal.", conf, conf2);
 		
 		conf2.getconfigProps().get("foo").setAppendable(false);
-		conf2.getconfigProps().put("bar", new PropValue("baz"));
+		conf2.setProp("bar", "baz");
 		assertNotEquals("Additional props should not be equal.", conf, conf2);
 	}
 	
@@ -79,16 +76,16 @@ public class TestGenJobConfiguration {
 		GenJobConfiguration merged = new GenJobConfiguration();
 		GenJobConfiguration complete = new GenJobConfiguration();
 		
-		conf.getconfigProps().put("foo", new PropValue("bar", true));
-		conf2.getconfigProps().put("foo", new PropValue("baz", true));
-		complete.getconfigProps().put("foo", new PropValue("bar", true));
+		conf.setProp("foo", "bar", true);
+		conf2.setProp("foo", "baz", true);
+		complete.setProp("foo", "bar", true);
 		complete.getconfigProps().get("foo").append("baz");
 		
-		conf.getconfigProps().put("bar", new PropValue("foo"));
-		complete.getconfigProps().put("bar", new PropValue("foo"));
+		conf.setProp("bar", "foo");
+		complete.setProp("bar", "foo");
 		
-		conf2.getconfigProps().put("bar", new PropValue("foo"));
-		complete.getconfigProps().put("bar", new PropValue("foo"));
+		conf2.setProp("bar", "foo");
+		complete.setProp("bar", "foo");
 		
 		merged.merge(conf);
 		merged.merge(conf2);
@@ -99,11 +96,11 @@ public class TestGenJobConfiguration {
 	@Test
 	public void testPropRetrieval() {
 		GenJobConfiguration conf = new GenJobConfiguration();
-		conf.getconfigProps().put("foo", new PropValue("bar"));
+		conf.setProp("foo", "bar");
 		
 		assertEquals("Should retrieve standard property", "bar", conf.getProp("foo"));
 		
-		conf.getconfigProps().put("bar", new PropValue("baz", true));
+		conf.setProp("bar", "baz", true);
 		conf.getconfigProps().get("bar").append("biz");
 		
 		String[] vals = conf.getPropSplit("bar");
@@ -111,7 +108,7 @@ public class TestGenJobConfiguration {
 		assertTrue("Split prop should have correct values", Arrays.asList(vals).contains("baz"));
 		assertTrue("Split prop should have correct values", Arrays.asList(vals).contains("biz"));
 		
-		conf.getconfigProps().put("biz", new PropValue("baz;biz", true));
+		conf.setProp("biz", "baz;biz", true);
 		
 		vals = conf.getPropSplit("biz", ";");
 		assertTrue("Split prop with custom delimiter should have the correct number of vals.", vals.length == 2);
