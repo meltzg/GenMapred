@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
@@ -17,8 +16,10 @@ import java.util.UUID;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.RawComparator;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Partitioner;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
@@ -34,23 +35,32 @@ public class GenJobRunner extends Configured implements Tool {
 		
 		Class<?> tmp;
 
-		// Set classes and configurations from the conf
+		// Set mandatory classes and configurations from the conf
 		String[] jarPaths = conf.getPropSplit(GenJobConfiguration.ARTIFACT_JAR_PATHS);
 		Set<String> jarSet = new HashSet<String>(Arrays.asList(jarPaths));
 		
 		tmp = getClass(conf.getProp(GenJobConfiguration.MAP_CLASS), jarSet);
 		Class<? extends Mapper> mapClass = tmp != null ? tmp.asSubclass(Mapper.class) : null;
-		tmp = getClass(conf.getProp(GenJobConfiguration.COMBINER_CLASS), jarSet);
-		Class<? extends Reducer> combinerClass = tmp != null ? tmp.asSubclass(Reducer.class) : null;
 		tmp = getClass(conf.getProp(GenJobConfiguration.REDUCER_CLASS), jarSet);
 		Class<? extends Reducer> reduceClass = tmp != null ? tmp.asSubclass(Reducer.class) : null;
-		
 		Class<?> outputKeyClass = getClass(conf.getProp(GenJobConfiguration.OUTPUT_KEY_CLASS), jarSet);
 		Class<?> outputValClass = getClass(conf.getProp(GenJobConfiguration.OUTPUT_VALUE_CLASS), jarSet);
 
 		String jobName = conf.getProp(GenJobConfiguration.JOB_NAME);
 		String inputPath = conf.getProp(GenJobConfiguration.INPUT_PATH);
 		String outputPath = conf.getProp(GenJobConfiguration.OUTPUT_PATH);
+		
+		// optional classes
+		tmp = getClass(conf.getProp(GenJobConfiguration.PARTITIONER_CLASS), jarSet);
+		Class<? extends Partitioner> partitionerClass = tmp != null? tmp.asSubclass(Partitioner.class) : null;
+		tmp = getClass(conf.getProp(GenJobConfiguration.SORT_COMPARATOR_CLASS), jarSet);
+		Class<? extends RawComparator> sortComparatorClass = tmp != null ? tmp.asSubclass(RawComparator.class) : null;
+		tmp = getClass(conf.getProp(GenJobConfiguration.COMBINER_CLASS), jarSet);
+		Class<? extends Reducer> combinerClass = tmp != null ? tmp.asSubclass(Reducer.class) : null;
+		tmp = getClass(conf.getProp(GenJobConfiguration.COMBINER_COMPARATOR_CLASS), jarSet);
+		Class<? extends RawComparator> combinerComparatorClass = tmp != null ? tmp.asSubclass(RawComparator.class) : null;
+		tmp = getClass(conf.getProp(GenJobConfiguration.GROUPING_COMPARATOR_CLASS), jarSet);
+		Class<? extends RawComparator> groupingComparatorClass = tmp != null ? tmp.asSubclass(RawComparator.class) : null;
 
 		validateJob(mapClass, reduceClass, outputKeyClass, outputValClass, jobName, inputPath, outputPath);
 
@@ -62,13 +72,26 @@ public class GenJobRunner extends Configured implements Tool {
 		FileOutputFormat.setOutputPath(job, new Path(outputPath));
 
 		job.setMapperClass(mapClass);
-		if (combinerClass != null) {
-			job.setCombinerClass(combinerClass);
-		}
 		job.setReducerClass(reduceClass);
 
 		job.setOutputKeyClass(outputKeyClass);
 		job.setOutputValueClass(outputValClass);
+		
+		if (partitionerClass != null) {
+			job.setPartitionerClass(partitionerClass);
+		}
+		if (sortComparatorClass != null) {
+			job.setSortComparatorClass(sortComparatorClass);
+		}
+		if (combinerClass != null) {
+			job.setCombinerClass(combinerClass);
+		}
+		if (combinerComparatorClass != null) {
+			job.setCombinerKeyGroupingComparatorClass(combinerComparatorClass);
+		}
+		if (groupingComparatorClass != null) {
+			job.setGroupingComparatorClass(groupingComparatorClass);
+		}
 		
 		for (Entry<String, PropValue> entry : conf.getconfigProps().entrySet()) {
 			job.getConfiguration().set(entry.getKey(), entry.getValue().getVal());

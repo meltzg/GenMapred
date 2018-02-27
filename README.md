@@ -41,7 +41,11 @@ Key | Value | Required | Notes
 --- | --- | --- | ---
 jobName | name to give job | ```true``` | 
 mapperClass | fully qualified mapper class name | ```true``` | 
+partitionerClass | fully qualified partitioner class name | ```false``` | 
+sortComparatorClass | fully qualified sort comparator class name | ```false``` | 
 combinerClass | fully qualified combiner class name | ```false``` | 
+combinerComparatorClass | fully qualified combiner key grouping comparator class name | ```false``` | 
+groupingComparatorClass | fully qualified grouping comparator class name | ```false``` | 
 reducerClass | fully qualified reducer class name | ```true``` | 
 inputPath | job input path | ```true``` | 
 outputPath | job output path | ```true``` | 

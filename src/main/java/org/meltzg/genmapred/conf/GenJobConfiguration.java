@@ -17,7 +17,11 @@ public class GenJobConfiguration {
 
 	public static final String JOB_NAME = "jobName";
 	public static final String MAP_CLASS = "mapperClass";
+	public static final String PARTITIONER_CLASS = "partitionerClass";
+	public static final String SORT_COMPARATOR_CLASS = "sortComparatorClass";
 	public static final String COMBINER_CLASS = "combinerClass";
+	public static final String COMBINER_COMPARATOR_CLASS = "combinerComparatorClass";
+	public static final String GROUPING_COMPARATOR_CLASS = "groupingComparatorClass";
 	public static final String REDUCER_CLASS = "reducerClass";
 	public static final String INPUT_PATH = "inputPath";
 	public static final String OUTPUT_PATH = "outputPath";
