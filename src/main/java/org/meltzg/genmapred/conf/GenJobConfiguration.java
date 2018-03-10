@@ -188,7 +188,7 @@ public class GenJobConfiguration {
 			return isAppendable;
 		}
 
-		public void setAppendable(boolean isAppendable) {
+		public void setIsAppendable(boolean isAppendable) {
 			this.isAppendable = isAppendable;
 		}
 

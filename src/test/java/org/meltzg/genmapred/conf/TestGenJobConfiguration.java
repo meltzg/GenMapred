@@ -61,10 +61,10 @@ public class TestGenJobConfiguration {
 		assertEquals("Same props with same values should be equal.", conf, conf2);
 		assertNotEquals("Same props with different values should not be equal.", conf, conf3);
 		
-		conf2.getconfigProps().get("foo").setAppendable(true);
+		conf2.getconfigProps().get("foo").setIsAppendable(true);
 		assertNotEquals("Same props, same value, different appendibility should not be equal.", conf, conf2);
 		
-		conf2.getconfigProps().get("foo").setAppendable(false);
+		conf2.getconfigProps().get("foo").setIsAppendable(false);
 		conf2.setProp("bar", "baz");
 		assertNotEquals("Additional props should not be equal.", conf, conf2);
 	}
