@@ -35,6 +35,10 @@ public class GenJobConfiguration {
 		this();
 		this.unmarshal(file);
 	}
+	
+	public GenJobConfiguration(Map<String, PropValue> configProps) {
+		this.configProps = configProps;
+	}
 
 	public GenJobConfiguration() {
 		this.configProps = new HashMap<String, PropValue>();
