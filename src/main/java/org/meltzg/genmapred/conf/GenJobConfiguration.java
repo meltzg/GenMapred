@@ -184,7 +184,7 @@ public class GenJobConfiguration {
 			this.val = val;
 		}
 
-		public boolean isAppendable() {
+		public boolean getIsAppendable() {
 			return isAppendable;
 		}
 
