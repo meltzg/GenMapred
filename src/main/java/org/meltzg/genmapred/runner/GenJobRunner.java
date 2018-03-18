@@ -110,7 +110,8 @@ public class GenJobRunner extends Configured implements Tool {
 		GenJobConfiguration primaryConf = new GenJobConfiguration();
 		GenJobConfiguration secondaryConf = new GenJobConfiguration();
 		
-		Path tmpLibPath = new Path("/tmp/artifacts/" + UUID.randomUUID().toString());
+		Path tmpLibPath = new Path(getConf().get("fs.default.name") + "/tmp/artifacts/" + UUID.randomUUID().toString());
+		System.out.println(tmpLibPath);
 
 		primaryConf.unmarshal(args[0]);
 		if (args.length == 2) {
