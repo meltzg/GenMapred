@@ -20,7 +20,8 @@ public class TestGenJobRunner {
 		GenJobConfiguration conf = getConf(true);
 		conf.setProp("foo", "bar");
 		try {
-			Job job = GenJobRunner.configureJob(conf);
+			GenJobRunner runner = new GenJobRunner();
+			Job job = runner.configureJob(conf);
 			assertEquals("Should add custom props to configuraiton", "bar", job.getConfiguration().get("foo"));
 		} catch (ClassNotFoundException | IllegalStateException | IOException e) {
 			fail("Failed to properly configure job");
@@ -32,7 +33,8 @@ public class TestGenJobRunner {
 	public void testConfigInvalidJob() {
 		GenJobConfiguration conf = getConf(false);
 		try {
-			Job job = GenJobRunner.configureJob(conf);
+			GenJobRunner runner = new GenJobRunner();
+			Job job = runner.configureJob(conf);
 		} catch (ClassNotFoundException e) {
 			fail("All classes should be found");
 			e.printStackTrace();

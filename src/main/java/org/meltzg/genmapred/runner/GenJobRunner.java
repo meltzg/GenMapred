@@ -30,8 +30,8 @@ import org.meltzg.genmapred.conf.GenJobConfiguration.PropValue;
 
 public class GenJobRunner extends Configured implements Tool {
 	
-	public static Job configureJob(GenJobConfiguration conf) throws IOException, ClassNotFoundException, IllegalStateException {
-		Job job = Job.getInstance();
+	public Job configureJob(GenJobConfiguration conf) throws IOException, ClassNotFoundException, IllegalStateException {
+		Job job = Job.getInstance(this.getConf());
 		
 		Class<?> tmp;
 
