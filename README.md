@@ -17,7 +17,7 @@ gradle clean build
 ## Usage
 
 ```
-hadoop jar GenMapred.jar org.meltzg.genmapred.runner.GenJobRunner primary.json [secondary.json]
+hadoop jar GenMapred.jar org.meltzg.genmapred.runner.GenJobRunner --primary primary.json [--secondary secondary.json] [--httpfs url for HttpFS]
 ```
 
 The GenJobRunner is a configurable Hadoop MapReduce Job runner.  It can be configured using the values in the primary and, optionally, the secondary JSON files.  Values in the primary, WILL NOT be overridden by values in the secondary.  Properties in the primary whose value has the ```appendable``` sub-property set to "true" will have the secondary's value appended with the GenJobConfiguration.PropValue.VAL_DELIMITER.
