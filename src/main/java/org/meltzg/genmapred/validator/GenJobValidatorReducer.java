@@ -11,6 +11,14 @@ import org.apache.hadoop.mapreduce.Reducer.Context;
 public class GenJobValidatorReducer extends Reducer<Text, IntWritable, Text, NullWritable> {
 	private NullWritable nWritable = NullWritable.get();
 	
+	public static String getOutputKeyClassName() {
+		return Text.class.getCanonicalName();
+	}
+	
+	public static String getOutputValueClassName() {
+		return NullWritable.class.getCanonicalName();
+	}
+	
 	@Override
 	public void reduce(Text key, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException {
 		int count = 0;
