@@ -57,7 +57,7 @@ public class GenJobRunner extends Configured implements Tool {
 		Class<?> outputValClass = getClass(conf.getProp(GenJobConfiguration.OUTPUT_VALUE_CLASS), jarSet);
 
 		String jobName = conf.getProp(GenJobConfiguration.JOB_NAME);
-		String inputPath = conf.getProp(GenJobConfiguration.INPUT_PATH);
+		String[] inputPaths = conf.getPropSplit(GenJobConfiguration.INPUT_PATH);
 		String outputPath = conf.getProp(GenJobConfiguration.OUTPUT_PATH);
 
 		// optional classes
@@ -74,13 +74,15 @@ public class GenJobRunner extends Configured implements Tool {
 		Class<? extends RawComparator> groupingComparatorClass = tmp != null ? tmp.asSubclass(RawComparator.class)
 				: null;
 
-		validateJob(mapClass, reduceClass, outputKeyClass, outputValClass, jobName, inputPath, outputPath);
+		validateJob(mapClass, reduceClass, outputKeyClass, outputValClass, jobName, inputPaths, outputPath);
 
 		// setup job
 		job.setJarByClass(GenJobRunner.class);
 		job.setJobName(jobName);
 
-		FileInputFormat.addInputPath(job, new Path(inputPath));
+		for (String path : inputPaths) {
+			FileInputFormat.addInputPath(job, new Path(path));
+		}
 		FileOutputFormat.setOutputPath(job, new Path(outputPath));
 
 		job.setMapperClass(mapClass);
@@ -207,7 +209,7 @@ public class GenJobRunner extends Configured implements Tool {
 	}
 
 	private static void validateJob(Class<? extends Mapper> mapClass, Class<? extends Reducer> reduceClass,
-			Class<?> outputKeyClass, Class<?> outputValClass, String jobName, String inputPath, String outputPath) {
+			Class<?> outputKeyClass, Class<?> outputValClass, String jobName, String[] inputPaths, String outputPath) {
 		List<String> missing = new ArrayList<String>();
 		if (mapClass == null) {
 			missing.add("MapperClass");
@@ -224,7 +226,7 @@ public class GenJobRunner extends Configured implements Tool {
 		if (jobName == null) {
 			missing.add("JobName");
 		}
-		if (inputPath == null || inputPath.length() == 0) {
+		if (inputPaths == null || inputPaths.length == 0) {
 			missing.add("InputPaths");
 		}
 		if (outputPath == null || outputPath.length() == 0) {
