@@ -177,6 +177,10 @@ public class GenJobConfiguration {
 			this.val = val;
 			this.isAppendable = isAppendable;
 		}
+		
+		public PropValue(PropValue other) {
+			this(other.val, other.isAppendable);
+		}
 
 		public String getVal() {
 			return val;
