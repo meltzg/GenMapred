@@ -25,6 +25,8 @@ public class GenJobConfiguration {
 	public static final String REDUCER_CLASS = "reducerClass";
 	public static final String INPUT_PATH = "inputPath";
 	public static final String OUTPUT_PATH = "outputPath";
+	public static final String MAP_OUTPUT_KEY_CLASS = "mapOutputKeyClass";
+	public static final String MAP_OUTPUT_VALUE_CLASS = "mapOutputValueClass";
 	public static final String OUTPUT_KEY_CLASS = "outputKeyClass";
 	public static final String OUTPUT_VALUE_CLASS = "outputValueClass";
 	public static final String ARTIFACT_JAR_PATHS = "artifactJars";

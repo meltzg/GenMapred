@@ -73,6 +73,8 @@ public class GenJobRunner extends Configured implements Tool {
 		tmp = getClass(conf.getProp(GenJobConfiguration.GROUPING_COMPARATOR_CLASS), jarSet);
 		Class<? extends RawComparator> groupingComparatorClass = tmp != null ? tmp.asSubclass(RawComparator.class)
 				: null;
+		Class<?> mapperOutputKeyClass = getClass(conf.getProp(GenJobConfiguration.MAP_OUTPUT_KEY_CLASS), jarSet);
+		Class<?> mapperOutputValueClass = getClass(conf.getProp(GenJobConfiguration.MAP_OUTPUT_VALUE_CLASS), jarSet);
 
 		validateJob(mapClass, reduceClass, outputKeyClass, outputValClass, jobName, inputPaths, outputPath);
 
@@ -91,6 +93,12 @@ public class GenJobRunner extends Configured implements Tool {
 		job.setOutputKeyClass(outputKeyClass);
 		job.setOutputValueClass(outputValClass);
 
+		if (mapperOutputKeyClass != null) {
+			job.setMapOutputKeyClass(mapperOutputKeyClass);
+		}
+		if (mapperOutputValueClass != null) {
+			job.setMapOutputValueClass(mapperOutputValueClass);
+		}
 		if (partitionerClass != null) {
 			job.setPartitionerClass(partitionerClass);
 		}

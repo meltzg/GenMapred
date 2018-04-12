@@ -49,6 +49,8 @@ groupingComparatorClass | fully qualified grouping comparator class name | ```fa
 reducerClass | fully qualified reducer class name | ```true``` | 
 inputPath | job input path | ```true``` | 
 outputPath | job output path | ```true``` | 
+mapOutputKeyClass | fully qualified mapper output key class name | ```false``` | Is only required if the mapper and reducer have different output types
+mapOutputValueClass | fully qualified mapper output value class name | ```false``` | Is only required if the mapper and reducer have different output types
 outputKeyClass | fully qualified output key class name | ```true``` | 
 outputValueClass | fully qualified output value class name | ```true``` | 
 artifactJars | '\|' delimited list of fully qualified jar paths | ```false``` | Is only required if configured classes are not already in the Hadoop Classpath
